@@ -18,6 +18,10 @@ import GroupTours from "./pages/GroupTours";
 import GroupDestinationPackages from "./pages/GroupDestinationPackages";
 import International from "./pages/International";
 import InternationalDestinationPackages from "./pages/InternationalDestinationPackages";
+import Domestic from "./pages/Domestic";
+import DomesticDestinationPackages from "./pages/DomesticDestinationPackages";
+import Honeymoon from "./pages/Honeymoon";
+import HoneymoonDestinationPackages from "./pages/HoneymoonDestinationPackages";
 import Itinerary from "./pages/Itinerary";
 import Footer from "./pages/components/Footer";
 
@@ -34,6 +38,10 @@ const App = () => {
         <Route path="/group-packages/:destination" element={<GroupDestinationPackages />} />
         <Route path="/international" element={<International />} />
         <Route path="/international-packages/:destination" element={<InternationalDestinationPackages />} />
+        <Route path="/domestic" element={<Domestic />} />
+        <Route path="/domestic-packages/:destination" element={<DomesticDestinationPackages />} />
+        <Route path="/honeymoon" element={<Honeymoon />} />
+        <Route path="/honeymoon-packages/:destination" element={<HoneymoonDestinationPackages />} />
         <Route path="/package/:id/itinerary" element={<Itinerary />} />
         {/* user */}
         <Route path="/profile" element={<PrivateRoute />}>

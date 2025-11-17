@@ -53,6 +53,8 @@ const Categories = () => {
             onClick={() => {
               if (item.id === "Group") navigate("/group-tours");
               else if (item.id === "International") navigate("/international");
+              else if (item.id === "Domestic") navigate("/domestic");
+              else if (item.id === "Honeymoon") navigate("/honeymoon");
               else navigate(`/search?searchTerm=${item.id}`);
             }}
             className="relative w-full h-40 rounded-xl overflow-hidden shadow-md hover:shadow-lg active:translate-y-[1px]"

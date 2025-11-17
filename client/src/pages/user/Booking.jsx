@@ -23,6 +23,7 @@ const Booking = () => {
     packageRating: 0,
     packageTotalRatings: 0,
     packageImages: [],
+    groupAvailableDates: [],
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -34,6 +35,7 @@ const Booking = () => {
     date: null,
   });
   const [currentDate, setCurrentDate] = useState("");
+  const [dateValid, setDateValid] = useState(true);
 
   const getPackageData = async () => {
     try {
@@ -59,6 +61,7 @@ const Booking = () => {
           packageRating: data?.packageData?.packageRating,
           packageTotalRatings: data?.packageData?.packageTotalRatings,
           packageImages: data?.packageData?.packageImages,
+          groupAvailableDates: data?.packageData?.groupAvailableDates || [],
         });
         setLoading(false);
       } else {
@@ -74,6 +77,14 @@ const Booking = () => {
 
   //handle payment & book package
   const handleBookPackage = async () => {
+    if (Array.isArray(packageData.groupAvailableDates) && packageData.groupAvailableDates.length > 0) {
+      const d = bookingData.date || "";
+      const ok = isDateAvailable(d, packageData.groupAvailableDates);
+      if (!ok) {
+        alert(formatAvailableDates(packageData.groupAvailableDates));
+        return;
+      }
+    }
     if (
       bookingData.packageDetails === "" ||
       bookingData.buyer === "" ||
@@ -129,6 +140,70 @@ const Booking = () => {
       });
     }
   }, [packageData, params]);
+
+  const normalizeMonth = (s) => {
+    const m = (s || "").toLowerCase();
+    if (m.startsWith("sep")) return "sep";
+    if (m.startsWith("oct")) return "oct";
+    if (m.startsWith("nov")) return "nov";
+    if (m.startsWith("dec")) return "dec";
+    if (m.startsWith("jan")) return "jan";
+    if (m.startsWith("feb")) return "feb";
+    if (m.startsWith("mar")) return "mar";
+    if (m.startsWith("apr")) return "apr";
+    if (m.startsWith("may")) return "may";
+    if (m.startsWith("jun")) return "jun";
+    if (m.startsWith("jul")) return "jul";
+    if (m.startsWith("aug")) return "aug";
+    return m;
+  };
+
+  const monthTokenFromDate = (dateStr) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    const n = d.getMonth();
+    const map = [
+      "jan",
+      "feb",
+      "mar",
+      "apr",
+      "may",
+      "jun",
+      "jul",
+      "aug",
+      "sep",
+      "oct",
+      "nov",
+      "dec",
+    ];
+    return map[n];
+  };
+
+  const isDateAvailable = (dateStr, list) => {
+    if (!dateStr) return false;
+    if (!Array.isArray(list) || list.length === 0) return true;
+    const d = new Date(dateStr);
+    const day = d.getDate();
+    const mon = monthTokenFromDate(dateStr);
+    for (let i = 0; i < list.length; i++) {
+      const item = list[i] || {};
+      const im = normalizeMonth(item.month);
+      const dates = Array.isArray(item.dates) ? item.dates : [];
+      if (im === mon && dates.includes(day)) return true;
+    }
+    return false;
+  };
+
+  const formatAvailableDates = (list) => {
+    if (!Array.isArray(list) || list.length === 0) return "Please select a date";
+    const parts = list.map((x) => {
+      const loc = x.location || "";
+      const mon = x.month || "";
+      const ds = (Array.isArray(x.dates) ? x.dates : []).join(", ");
+      return `${loc ? loc + " " : ""}${mon} ${ds}`.trim();
+    });
+    return `Available dates are: ${parts.join("; ")}`;
+  };
 
   return (
     <div className="w-full flex flex-col items-center">
@@ -236,7 +311,11 @@ const Booking = () => {
                   id="date"
                   className="w-max border rounded"
                   onChange={(e) => {
-                    setBookingData({ ...bookingData, date: e.target.value });
+                    const v = e.target.value;
+                    setBookingData({ ...bookingData, date: v });
+                    const ok = isDateAvailable(v, packageData.groupAvailableDates);
+                    setDateValid(ok);
+                    if (!ok) alert(formatAvailableDates(packageData.groupAvailableDates));
                   }}
                 />
               </div>
@@ -321,7 +400,9 @@ const Booking = () => {
                 <button
                   className="p-2 rounded bg-blue-600 text-white hover:opacity-95 cursor-pointer"
                   onClick={handleBookPackage}
-                  disabled={loading || !currentUser?.address || !bookingData?.date}
+                  disabled={
+                    loading || !currentUser?.address || !bookingData?.date || !dateValid
+                  }
                 >
                   {loading ? "Processing..." : "Book Now"}
                 </button>

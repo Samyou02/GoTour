@@ -16,6 +16,8 @@ import Booking from "./pages/user/Booking";
 import Search from "./pages/Search";
 import GroupTours from "./pages/GroupTours";
 import GroupDestinationPackages from "./pages/GroupDestinationPackages";
+import International from "./pages/International";
+import InternationalDestinationPackages from "./pages/InternationalDestinationPackages";
 import Itinerary from "./pages/Itinerary";
 import Footer from "./pages/components/Footer";
 
@@ -30,6 +32,8 @@ const App = () => {
         <Route path="/search" element={<Search />} />
         <Route path="/group-tours" element={<GroupTours />} />
         <Route path="/group-packages/:destination" element={<GroupDestinationPackages />} />
+        <Route path="/international" element={<International />} />
+        <Route path="/international-packages/:destination" element={<InternationalDestinationPackages />} />
         <Route path="/package/:id/itinerary" element={<Itinerary />} />
         {/* user */}
         <Route path="/profile" element={<PrivateRoute />}>

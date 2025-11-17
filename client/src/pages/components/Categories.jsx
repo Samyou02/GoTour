@@ -50,7 +50,11 @@ const Categories = () => {
         {items.map((item, i) => (
           <button
             key={i}
-            onClick={() => navigate(item.id === "Group" ? "/group-tours" : `/search?searchTerm=${item.id}`)}
+            onClick={() => {
+              if (item.id === "Group") navigate("/group-tours");
+              else if (item.id === "International") navigate("/international");
+              else navigate(`/search?searchTerm=${item.id}`);
+            }}
             className="relative w-full h-40 rounded-xl overflow-hidden shadow-md hover:shadow-lg active:translate-y-[1px]"
           >
             <img src={item.image} alt={item.title} className="w-full h-full object-cover" />

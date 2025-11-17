@@ -1,22 +1,14 @@
 import Package from "../models/package.model.js";
-import braintree from "braintree";
 import dotenv from "dotenv";
 import Booking from "../models/booking.model.js";
 dotenv.config();
-
-//payment gateway
-var gateway = new braintree.BraintreeGateway({
-  environment: braintree.Environment.Sandbox,
-  merchantId: process.env.BRAINTREE_MERCHANT_ID,
-  publicKey: process.env.BRAINTREE_PUBLIC_KEY,
-  privateKey: process.env.BRAINTREE_PRIVATE_KEY,
-});
 
 //create package
 export const createPackage = async (req, res) => {
   try {
     const {
       packageName,
+      packageCategory,
       packageDescription,
       packageDestination,
       packageDays,
@@ -33,6 +25,7 @@ export const createPackage = async (req, res) => {
 
     if (
       !packageName ||
+      packageCategory === "" ||
       !packageDescription ||
       !packageDestination ||
       !packageAccommodation ||
@@ -99,7 +92,11 @@ export const getPackages = async (req, res) => {
 
     const order = req.query.order || "desc";
 
+    const category = req.query.category;
+    const categoryFilter = category ? { packageCategory: category } : {};
+
     const packages = await Package.find({
+      ...categoryFilter,
       $or: [
         { packageName: { $regex: searchTerm, $options: "i" } },
         { packageDestination: { $regex: searchTerm, $options: "i" } },
@@ -176,22 +173,6 @@ export const deletePackage = async (req, res) => {
     return res.status(200).send({
       success: true,
       message: "Package Deleted!",
-    });
-  } catch (error) {
-    cnsole.log(error);
-  }
-};
-
-//payment gateway api
-//token
-export const braintreeTokenController = async (req, res) => {
-  try {
-    gateway.clientToken.generate({}, function (err, response) {
-      if (err) {
-        res.status(500).send(err);
-      } else {
-        res.send(response);
-      }
     });
   } catch (error) {
     console.log(error);

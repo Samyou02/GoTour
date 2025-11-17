@@ -16,9 +16,16 @@ const PackageCard = ({ packageData }) => {
           <p className="font-semibold text-lg capitalize w-[90%] xsm:w-[250px] truncate">
             {packageData.packageName}
           </p>
-          <p className="text-green-700 text-lg capitalize">
-            {packageData.packageDestination}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-green-700 text-lg capitalize">
+              {packageData.packageDestination}
+            </p>
+            {packageData.packageCategory && (
+              <span className="text-xs px-2 py-1 rounded-full bg-slate-100 border">
+                {packageData.packageCategory}
+              </span>
+            )}
+          </div>
           {(+packageData.packageDays > 0 || +packageData.packageNights > 0) && (
             <p className="flex text-lg items-center gap-2">
               <FaClock />
@@ -48,7 +55,7 @@ const PackageCard = ({ packageData }) => {
                 ({packageData.packageTotalRatings})
               </p>
             )}
-            {packageData.offer && packageData.packageDiscountPrice ? (
+            {packageData.packageOffer && packageData.packageDiscountPrice ? (
               <p className="flex gap-1">
                 <span className="line-through text-gray-700">
                   ${packageData.packagePrice}

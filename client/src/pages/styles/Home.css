@@ -8,12 +8,26 @@
     filter: brightness(0.7);
     height: 340px;
 }
+.hero_overlay{
+    position: absolute;
+    width: 100%;
+    height: 340px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.0) 60%, rgba(0,0,0,0.35) 100%);
+    pointer-events: none;
+}
 .top-part{
     position: absolute;
     height: 340px;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.parallax{
+    perspective: 800px;
+}
+.parallax .layer{
+    transform: translateZ(30px);
 }
 
 .offers_img{
@@ -60,4 +74,39 @@
         background-position: 0px -220px;
         background-size: cover;
     }
+}
+@keyframes floatY {
+    0% { transform: translateY(0) }
+    50% { transform: translateY(-4px) }
+    100% { transform: translateY(0) }
+}
+@keyframes gradientShift {
+    0% { background-position: 0% 50% }
+    50% { background-position: 100% 50% }
+    100% { background-position: 0% 50% }
+}
+@keyframes shimmer {
+    0% { background-position: -200% 0 }
+    100% { background-position: 200% 0 }
+}
+.gradient_title{
+    background: linear-gradient(90deg,#06b6d4,#6366f1,#22c55e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+}
+.glass_group{
+    backdrop-filter: blur(12px);
+    background: rgba(255,255,255,0.18);
+    border-radius: 9999px;
+    border: 1px solid rgba(255,255,255,0.35);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+.glow{
+    box-shadow: 0 8px 24px rgba(99,102,241,0.35);
+}
+.animate_float{
+    animation: floatY 6s ease-in-out infinite;
 }

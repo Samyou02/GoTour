@@ -6,6 +6,10 @@ const packageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    packageCategory: {
+      type: String,
+      default: "General",
+    },
     packageDescription: {
       type: String,
       required: true,
@@ -61,6 +65,22 @@ const packageSchema = new mongoose.Schema(
     packageImages: {
       type: Array,
       required: true,
+    },
+    groupAvailableDates: {
+      type: Array,
+      default: [],
+    },
+    itineraryDays: {
+      type: Array,
+      default: [],
+    },
+    inclusions: {
+      type: Array,
+      default: [],
+    },
+    exclusions: {
+      type: Array,
+      default: [],
     },
   },
   { timestamps: true }

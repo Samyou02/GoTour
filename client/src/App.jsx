@@ -14,6 +14,10 @@ import Package from "./pages/Package";
 import RatingsPage from "./pages/RatingsPage";
 import Booking from "./pages/user/Booking";
 import Search from "./pages/Search";
+import GroupTours from "./pages/GroupTours";
+import GroupDestinationPackages from "./pages/GroupDestinationPackages";
+import Itinerary from "./pages/Itinerary";
+import Footer from "./pages/components/Footer";
 
 const App = () => {
   return (
@@ -24,6 +28,9 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/group-tours" element={<GroupTours />} />
+        <Route path="/group-packages/:destination" element={<GroupDestinationPackages />} />
+        <Route path="/package/:id/itinerary" element={<Itinerary />} />
         {/* user */}
         <Route path="/profile" element={<PrivateRoute />}>
           <Route path="user" element={<Profile />} />
@@ -41,6 +48,7 @@ const App = () => {
           <Route path=":packageId" element={<Booking />} />
         </Route>
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 };

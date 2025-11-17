@@ -25,6 +25,7 @@ const Package = () => {
   const navigate = useNavigate();
   const [packageData, setPackageData] = useState({
     packageName: "",
+    packageCategory: "General",
     packageDescription: "",
     packageDestination: "",
     packageDays: 1,
@@ -62,6 +63,7 @@ const Package = () => {
       if (data?.success) {
         setPackageData({
           packageName: data?.packageData?.packageName,
+          packageCategory: data?.packageData?.packageCategory || "General",
           packageDescription: data?.packageData?.packageDescription,
           packageDestination: data?.packageData?.packageDestination,
           packageDays: data?.packageData?.packageDays,
@@ -257,6 +259,11 @@ const Package = () => {
             <p className="text-green-700 flex items-center gap-1 text-lg capitalize">
               <FaMapMarkerAlt />
               {packageData?.packageDestination}
+              {packageData?.packageCategory && (
+                <span className="ml-2 text-xs px-2 py-1 rounded-full bg-slate-100 border">
+                  {packageData?.packageCategory}
+                </span>
+              )}
             </p>
             {/* destination */}
             {/* days & nights */}

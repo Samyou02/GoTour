@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import {
   updateUserStart,
@@ -10,6 +11,7 @@ import {
 } from "../../redux/user/userSlice";
 
 const UpdateProfile = () => {
+  const navigate = useNavigate();
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [updateProfileDetailsPanel, setUpdateProfileDetailsPanel] =

@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import { FaClock, FaMapMarkerAlt } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
-import DropIn from "braintree-web-drop-in-react";
-import axios from "axios";
 
 const Booking = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -35,8 +33,6 @@ const Booking = () => {
     persons: 1,
     date: null,
   });
-  const [clientToken, setClientToken] = useState("");
-  const [instance, setInstance] = useState("");
   const [currentDate, setCurrentDate] = useState("");
 
   const getPackageData = async () => {
@@ -74,18 +70,7 @@ const Booking = () => {
     }
   };
 
-  //get paymentgateway token
-  const getToken = async () => {
-    try {
-      const { data } = await axios.get(`/api/package/braintree/token`);
-      setClientToken(data?.clientToken);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  useEffect(() => {
-    getToken();
-  }, [currentUser]);
+  
 
   //handle payment & book package
   const handleBookPackage = async () => {
@@ -333,36 +318,13 @@ const Booking = () => {
                 </span>
               </p>
               <div className="my-2 max-w-[300px] gap-1">
-                <p
-                  className={`font-semibold ${
-                    instance && "text-red-700 text-sm"
-                  }`}
+                <button
+                  className="p-2 rounded bg-blue-600 text-white hover:opacity-95 cursor-pointer"
+                  onClick={handleBookPackage}
+                  disabled={loading || !currentUser?.address || !bookingData?.date}
                 >
-                  Payment:
-                  {!instance
-                    ? "Loading..."
-                    : "Don't use your original card details!(This is not the production build)"}
-                </p>
-                {clientToken && (
-                  <>
-                    <DropIn
-                      options={{
-                        authorization: clientToken,
-                        paypal: {
-                          flow: "vault",
-                        },
-                      }}
-                      onInstance={(instance) => setInstance(instance)}
-                    />
-                    <button
-                      className="p-2 rounded bg-blue-600 text-white payment-btn disabled:optional:80 hover:opacity-95 cursor-pointer"
-                      onClick={handleBookPackage}
-                      disabled={loading || !instance || !currentUser?.address}
-                    >
-                      {loading ? "Processing..." : "Book Now"}
-                    </button>
-                  </>
-                )}
+                  {loading ? "Processing..." : "Book Now"}
+                </button>
               </div>
             </div>
           </div>

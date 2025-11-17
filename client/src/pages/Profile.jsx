@@ -12,13 +12,7 @@ import {
   deleteUserAccountSuccess,
   deleteUserAccountFailure,
 } from "../redux/user/userSlice";
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
-import { app } from "../firebase";
+ 
 import MyBookings from "./user/MyBookings";
 import UpdateProfile from "./user/UpdateProfile";
 import MyHistory from "./user/MyHistory";
@@ -54,50 +48,45 @@ const Profile = () => {
   const handleProfilePhoto = (photo) => {
     try {
       dispatch(updateUserStart());
-      const storage = getStorage(app);
-      const photoname = new Date().getTime() + photo.name.replace(/\s/g, "");
-      const storageRef = ref(storage, `profile-photos/${photoname}`); //profile-photos - folder name in firebase
-      const uploadTask = uploadBytesResumable(storageRef, photo);
-
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress = Math.floor(
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          );
-          //   console.log(progress);
-          setPhotoPercentage(progress);
-        },
-        (error) => {
-          console.log(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadUrl) => {
-            const res = await fetch(
-              `/api/user/update-profile-photo/${currentUser._id}`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": " application/json",
-                },
-                body: JSON.stringify({ avatar: downloadUrl }),
-              }
-            );
-            const data = await res.json();
-            if (data?.success) {
-              alert(data?.message);
-              setFormData({ ...formData, avatar: downloadUrl });
-              dispatch(updateUserSuccess(data?.user));
-              setProfilePhoto(null);
-              return;
-            } else {
-              dispatch(updateUserFailure(data?.message));
+      const form = new FormData();
+      form.append("file", photo);
+      form.append("folder", "profile-photos");
+      fetch(`/api/upload/image`, {
+        method: "POST",
+        body: form,
+        credentials: "include",
+      })
+        .then(async (res) => {
+          const data = await res.json();
+          if (!res.ok || data?.success !== true) throw new Error(data?.message || "Upload failed");
+          setPhotoPercentage(100);
+          const downloadUrl = data.url;
+          const resp = await fetch(
+            `/api/user/update-profile-photo/${currentUser._id}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": " application/json",
+              },
+              body: JSON.stringify({ avatar: downloadUrl }),
             }
-            dispatch(updateUserFailure(data?.message));
-            alert(data?.message);
-          });
-        }
-      );
+          );
+          const json = await resp.json();
+          if (json?.success) {
+            alert(json?.message);
+            setFormData({ ...formData, avatar: downloadUrl });
+            dispatch(updateUserSuccess(json?.user));
+            setProfilePhoto(null);
+          } else {
+            dispatch(updateUserFailure(json?.message));
+            alert(json?.message);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          dispatch(updateUserFailure("Upload failed"));
+          alert("Upload failed");
+        });
     } catch (error) {
       console.log(error);
     }

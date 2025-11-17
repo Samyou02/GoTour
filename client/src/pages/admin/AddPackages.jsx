@@ -1,15 +1,9 @@
 import React, { useState } from "react";
-import { app } from "../../firebase";
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
 
 const AddPackages = () => {
   const [formData, setFormData] = useState({
     packageName: "",
+    packageCategory: "General",
     packageDescription: "",
     packageDestination: "",
     packageDays: 1,
@@ -22,6 +16,10 @@ const AddPackages = () => {
     packageDiscountPrice: 0,
     packageOffer: false,
     packageImages: [],
+    groupAvailableDates: [],
+    itineraryDays: [],
+    inclusions: [],
+    exclusions: [],
   });
   const [images, setImages] = useState([]);
   const [imageUploadError, setImageUploadError] = useState(false);
@@ -59,7 +57,7 @@ const AddPackages = () => {
           setUploading(false);
         })
         .catch((err) => {
-          setImageUploadError("Image upload failed (2mb max per image)");
+          setImageUploadError(err?.message || "Image upload failed");
           setUploading(false);
         });
     } else {
@@ -70,26 +68,21 @@ const AddPackages = () => {
 
   const storeImage = async (file) => {
     return new Promise((resolve, reject) => {
-      const storage = getStorage(app);
-      const fileName = new Date().getTime() + file.name.replace(/\s/g, "");
-      const storageRef = ref(storage, fileName);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setImageUploadPercent(Math.floor(progress));
-        },
-        (error) => {
-          reject(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            resolve(downloadURL);
-          });
-        }
-      );
+      const form = new FormData();
+      form.append("file", file);
+      form.append("folder", "package-images");
+      fetch(`/api/upload/image`, {
+        method: "POST",
+        body: form,
+        credentials: "include",
+      })
+        .then(async (res) => {
+          const data = await res.json();
+          if (!res.ok || data?.success !== true) throw new Error(data?.message || "Upload failed");
+          setImageUploadPercent(100);
+          resolve(data.url);
+        })
+        .catch((err) => reject(err));
     });
   };
 
@@ -152,6 +145,7 @@ const AddPackages = () => {
       alert(data?.message);
       setFormData({
         packageName: "",
+        packageCategory: "General",
         packageDescription: "",
         packageDestination: "",
         packageDays: 1,
@@ -164,6 +158,10 @@ const AddPackages = () => {
         packageDiscountPrice: 0,
         packageOffer: false,
         packageImages: [],
+        groupAvailableDates: [],
+        itineraryDays: [],
+        inclusions: [],
+        exclusions: [],
       });
       setImages([]);
     } catch (err) {
@@ -190,6 +188,138 @@ const AddPackages = () => {
             />
           </div>
           <div className="flex flex-col w-full">
+            <label className="font-semibold">Outlined Itinerary:</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                id="it_day_title"
+                placeholder="Day title (e.g. Hyderabad to Delhi)"
+                className="border border-black rounded p-1 flex-1"
+                onChange={(e) => setFormData({ ...formData, it_day_title: e.target.value })}
+              />
+              <button
+                type="button"
+                className="bg-slate-700 text-white px-3 rounded"
+                onClick={() => {
+                  const title = formData.it_day_title || "";
+                  if (!title) return;
+                  const next = [...formData.itineraryDays, { title }];
+                  const { it_day_title, ...rest } = formData;
+                  setFormData({ ...rest, itineraryDays: next });
+                }}
+              >
+                Add Day
+              </button>
+            </div>
+            <div className="mt-2 flex flex-col gap-1">
+              {(Array.isArray(formData.itineraryDays) ? formData.itineraryDays : []).map((d, i) => (
+                <div key={i} className="flex items-center justify-between border rounded p-2 text-sm">
+                  <span>Day {i + 1} - {d.title}</span>
+                  <button
+                    type="button"
+                    className="text-red-600"
+                    onClick={() => {
+                      const arr = Array.isArray(formData.itineraryDays) ? formData.itineraryDays : [];
+                      const next = arr.filter((_, idx) => idx !== i);
+                      setFormData({ ...formData, itineraryDays: next });
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col w-full">
+            <label className="font-semibold">Inclusions:</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                id="incl"
+                placeholder="Add inclusion"
+                className="border border-black rounded p-1 flex-1"
+                onChange={(e) => setFormData({ ...formData, incl: e.target.value })}
+              />
+              <button
+                type="button"
+                className="bg-slate-700 text-white px-3 rounded"
+                onClick={() => {
+                  const v = formData.incl || "";
+                  if (!v) return;
+                  const next = [...formData.inclusions, v];
+                  const { incl, ...rest } = formData;
+                  setFormData({ ...rest, inclusions: next });
+                }}
+              >
+                Add
+              </button>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {(Array.isArray(formData.inclusions) ? formData.inclusions : []).map((v, i) => (
+                <div key={i} className="border rounded p-2 text-sm flex items-center gap-2">
+                  <span>{v}</span>
+                  <button className="text-red-600" type="button" onClick={() => {
+                    const arr = Array.isArray(formData.inclusions) ? formData.inclusions : [];
+                    const next = arr.filter((_, idx) => idx !== i);
+                    setFormData({ ...formData, inclusions: next });
+                  }}>Remove</button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col w-full">
+            <label className="font-semibold">Exclusions:</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                id="excl"
+                placeholder="Add exclusion"
+                className="border border-black rounded p-1 flex-1"
+                onChange={(e) => setFormData({ ...formData, excl: e.target.value })}
+              />
+              <button
+                type="button"
+                className="bg-slate-700 text-white px-3 rounded"
+                onClick={() => {
+                  const v = formData.excl || "";
+                  if (!v) return;
+                  const next = [...formData.exclusions, v];
+                  const { excl, ...rest } = formData;
+                  setFormData({ ...rest, exclusions: next });
+                }}
+              >
+                Add
+              </button>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {(Array.isArray(formData.exclusions) ? formData.exclusions : []).map((v, i) => (
+                <div key={i} className="border rounded p-2 text-sm flex items-center gap-2">
+                  <span>{v}</span>
+                  <button className="text-red-600" type="button" onClick={() => {
+                    const arr = Array.isArray(formData.exclusions) ? formData.exclusions : [];
+                    const next = arr.filter((_, idx) => idx !== i);
+                    setFormData({ ...formData, exclusions: next });
+                  }}>Remove</button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col w-full">
+            <label htmlFor="packageCategory">Category:</label>
+            <select
+              className="border border-black rounded"
+              id="packageCategory"
+              value={formData.packageCategory}
+              onChange={handleChange}
+            >
+              <option>General</option>
+              <option>Group</option>
+              <option>International</option>
+              <option>Domestic</option>
+              <option>Honeymoon</option>
+            </select>
+          </div>
+          <div className="flex flex-col w-full">
             <label htmlFor="packageDescription">Description:</label>
             <textarea
               type="text"
@@ -198,6 +328,76 @@ const AddPackages = () => {
               value={formData.packageDescription}
               onChange={handleChange}
             />
+          </div>
+          <div className="flex flex-col w-full">
+            <label className="font-semibold">Group Available Dates:</label>
+            <div className="flex flex-wrap gap-2">
+              <input
+                type="text"
+                placeholder="Location"
+                id="gad_location"
+                className="border border-black rounded p-1 flex-1"
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setFormData({ ...formData, gad_location: v });
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Month (e.g. Sept)"
+                id="gad_month"
+                className="border border-black rounded p-1 flex-1"
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setFormData({ ...formData, gad_month: v });
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Dates comma separated (e.g. 5,12,20)"
+                id="gad_dates"
+                className="border border-black rounded p-1 flex-1"
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setFormData({ ...formData, gad_dates: v });
+                }}
+              />
+              <button
+                type="button"
+                className="bg-slate-700 text-white px-3 rounded"
+                onClick={() => {
+                  const loc = formData.gad_location || "";
+                  const mon = formData.gad_month || "";
+                  const arr = (formData.gad_dates || "").split(",").map((x) => x.trim()).filter(Boolean).map((x) => parseInt(x));
+                  if (!mon || arr.length === 0) return;
+                  const next = [...formData.groupAvailableDates, { location: loc, month: mon, dates: arr }];
+                  const { gad_location, gad_month, gad_dates, ...rest } = formData;
+                  setFormData({ ...rest, groupAvailableDates: next });
+                }}
+              >
+                Add
+              </button>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {(Array.isArray(formData.groupAvailableDates) ? formData.groupAvailableDates : []).map((d, i) => (
+                <div key={i} className="border rounded p-2 text-sm flex items-center gap-2">
+                  <span>{d.location || ""}</span>
+                  <span>{d.month}</span>
+                  <span>Dates: {d.dates.join(", ")}</span>
+                  <button
+                    type="button"
+                    className="text-red-600"
+                    onClick={() => {
+                      const arr = Array.isArray(formData.groupAvailableDates) ? formData.groupAvailableDates : [];
+                      const next = arr.filter((_, idx) => idx !== i);
+                      setFormData({ ...formData, groupAvailableDates: next });
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
           <div className="flex flex-col w-full">
             <label htmlFor="packageDestination">Destination:</label>
@@ -313,7 +513,7 @@ const AddPackages = () => {
             <label htmlFor="packageImages">
               Images:
               <span className="text-red-700 text-sm">
-                (images size should be less than 2mb and max 5 images)
+                (images size should be less than 10mb and max 5 images)
               </span>
             </label>
             <input

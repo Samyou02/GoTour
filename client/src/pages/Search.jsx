@@ -7,8 +7,8 @@ const Search = () => {
   const [sideBarSearchData, setSideBarSearchData] = useState({
     searchTerm: "",
     offer: false,
-    sort: "created_at",
-    order: "desc",
+    sort: "",
+    order: "",
   });
   const [loading, setLoading] = useState(false);
   const [allPackages, setAllPackages] = useState([]);
@@ -26,8 +26,8 @@ const Search = () => {
       setSideBarSearchData({
         searchTerm: searchTermFromUrl || "",
         offer: offerFromUrl === "true" ? true : false,
-        sort: sortFromUrl || "created_at",
-        order: orderFromUrl || "desc",
+        sort: sortFromUrl || "",
+        order: orderFromUrl || "",
       });
     }
 
@@ -60,18 +60,34 @@ const Search = () => {
       });
     }
     if (e.target.id === "offer") {
-      setSideBarSearchData({
+      const next = {
         ...sideBarSearchData,
-        [e.target.id]:
-          e.target.checked || e.target.checked === "true" ? true : false,
-      });
+        [e.target.id]: e.target.checked || e.target.checked === "true" ? true : false,
+      };
+      setSideBarSearchData(next);
+      const urlParams = new URLSearchParams();
+      urlParams.set("searchTerm", next.searchTerm);
+      urlParams.set("offer", next.offer);
+      if (next.sort) {
+        urlParams.set("sort", next.sort);
+        urlParams.set("order", next.order || "desc");
+      }
+      navigate(`/search?${urlParams.toString()}`);
     }
     if (e.target.id === "sort_order") {
-      const sort = e.target.value.split("_")[0] || "created_at";
-
-      const order = e.target.value.split("_")[1] || "desc";
-
-      setSideBarSearchData({ ...sideBarSearchData, sort, order });
+      const isAll = e.target.value === "all";
+      const sort = isAll ? "" : e.target.value.split("_")[0] || "createdAt";
+      const order = isAll ? "" : e.target.value.split("_")[1] || "desc";
+      const next = { ...sideBarSearchData, sort, order };
+      setSideBarSearchData(next);
+      const urlParams = new URLSearchParams();
+      urlParams.set("searchTerm", next.searchTerm);
+      urlParams.set("offer", next.offer);
+      if (next.sort) {
+        urlParams.set("sort", next.sort);
+        urlParams.set("order", next.order || "desc");
+      }
+      navigate(`/search?${urlParams.toString()}`);
     }
   };
 
@@ -81,8 +97,10 @@ const Search = () => {
     const urlParams = new URLSearchParams();
     urlParams.set("searchTerm", sideBarSearchData.searchTerm);
     urlParams.set("offer", sideBarSearchData.offer);
-    urlParams.set("sort", sideBarSearchData.sort);
-    urlParams.set("order", sideBarSearchData.order);
+    if (sideBarSearchData.sort) {
+      urlParams.set("sort", sideBarSearchData.sort);
+      urlParams.set("order", sideBarSearchData.order || "desc");
+    }
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
   };
@@ -133,10 +151,11 @@ const Search = () => {
             <label className="font-semibold">Sort:</label>
             <select
               onChange={handleChange}
-              defaultValue={"created_at_desc"}
+              value={sideBarSearchData.sort ? `${sideBarSearchData.sort}_${sideBarSearchData.order || "desc"}` : "all"}
               id="sort_order"
               className="p-3 border rounded-lg"
             >
+              <option value="all">All</option>
               <option value="packagePrice_desc">Price high to low</option>
               <option value="packagePrice_asc">Price low to high</option>
               <option value="packageRating_desc">Top Rated</option>

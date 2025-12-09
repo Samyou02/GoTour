@@ -8,6 +8,7 @@ import Profile from "./pages/Profile";
 import About from "./pages/About";
 import PrivateRoute from "./pages/Routes/PrivateRoute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import SiteContent from "./pages/admin/SiteContent";
 import AdminRoute from "./pages/Routes/AdminRoute";
 import UpdatePackage from "./pages/admin/UpdatePackage";
 import Package from "./pages/Package";
@@ -51,6 +52,7 @@ const App = () => {
         <Route path="/profile" element={<AdminRoute />}>
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="admin/update-package/:id" element={<UpdatePackage />} />
+          <Route path="admin/site-content" element={<SiteContent />} />
         </Route>
         <Route path="/about" element={<About />} />
         <Route path="/package/:id" element={<Package />} />

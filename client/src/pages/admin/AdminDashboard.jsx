@@ -322,6 +322,17 @@ const AdminDashboard = () => {
                   >
                     History
                   </button>
+                  <button
+                    className={
+                      activePanelId === 9
+                        ? "p-1 rounded-t transition-all duration-300 text-nowrap bg-blue-500 text-white"
+                        : "p-1 rounded-t transition-all duration-300 text-nowrap"
+                    }
+                    id="site-content"
+                    onClick={() => setActivePanelId(9)}
+                  >
+                    Site Content
+                  </button>
                   {/* <button
                     className={
                       activePanelId === 7
@@ -352,6 +363,10 @@ const AdminDashboard = () => {
                   <History />
                 ) : activePanelId === 8 ? (
                   <AdminUpdateProfile />
+                ) : activePanelId === 9 ? (
+                  <div className="w-full p-2">
+                    <Link className="text-blue-600 underline" to="/profile/admin/site-content">Open Site Content Editor</Link>
+                  </div>
                 ) : (
                   <div>Page Not Found!</div>
                 )}

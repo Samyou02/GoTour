@@ -7,6 +7,7 @@ import ratingRoute from "./routes/rating.route.js";
 import bookingRoute from "./routes/booking.route.js";
 import uploadRoute from "./routes/upload.route.js";
 import statsRoute from "./routes/stats.route.js";
+import settingsRoute from "./routes/settings.route.js";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import path from "path";
@@ -72,6 +73,7 @@ app.use("/api/rating", ratingRoute);
 app.use("/api/booking", bookingRoute);
 app.use("/api/upload", uploadRoute);
 app.use("/api/stats", statsRoute);
+app.use("/api/settings", settingsRoute);
 
 if (process.env.NODE_ENV_CUSTOM === "devolopment ") {
   //static files

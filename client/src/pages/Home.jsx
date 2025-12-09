@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./styles/Home.css";
 import { FaCalendar, FaSearch, FaStar } from "react-icons/fa";
 import { FaRankingStar } from "react-icons/fa6";
@@ -11,18 +11,33 @@ const Home = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [settings, setSettings] = useState(null);
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const res = await fetch("/api/settings");
+        const data = await res.json();
+        if (data?.success) setSettings(data.settings);
+      } catch (e) {}
+    };
+    loadSettings();
+  }, []);
 
   return (
     <div className="main w-full">
       <div className="w-full flex flex-col">
-        <div className="backaground_image w-full"></div>
+        <div
+          className="backaground_image w-full"
+          style={settings?.heroBackgroundImage ? { backgroundImage: `url(${settings.heroBackgroundImage})` } : undefined}
+        ></div>
         <div className="hero_overlay w-full"></div>
         <div className="top-part w-full gap-3 flex flex-col parallax">
           <h1 className="text-white text-4xl md:text-5xl text-center font-extrabold tracking-tight gradient_title">
-            GoTour
+            {settings?.heroTitle || "GoTour"}
           </h1>
           <h2 className="text-white text-sm text-center xsm:text-lg font-medium layer">
-            Discover, plan, and book trusted travel experiences.
+            {settings?.heroSubtitle || "Discover, plan, and book trusted travel experiences."}
           </h2>
           <div className="w-full flex justify-center items-center gap-3 mt-6 layer animate_float">
             <div className="glass_group flex items-center px-3 py-2 w-[90%] max-w-xl">
@@ -87,7 +102,7 @@ const Home = () => {
         </div>
         {/* main page */}
         <div className="main p-6 flex flex-col gap-6">
-          <Categories />
+          <Categories items={settings?.categories || []} />
         </div>
       </div>
     </div>

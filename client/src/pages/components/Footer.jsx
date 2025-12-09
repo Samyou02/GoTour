@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaPhone, FaEnvelope, FaInstagram, FaWhatsapp, FaFacebook } from "react-icons/fa";
 
@@ -9,16 +10,7 @@ const Footer = () => {
           <div className="flex items-center gap-2">
             <span className="text-3xl font-extrabold tracking-tight">GoTour</span>
           </div>
-          <div className="text-sm">
-            <p className="font-semibold">Head Office:</p>
-            <p>GoTour HQ, 107 X Road, Mahalakshmi Nagar</p>
-            <p>Mothe, Jagtial, Telangana 505327</p>
-          </div>
-          <div className="text-sm mt-2">
-            <p className="font-semibold">Branch Offices:</p>
-            <p>Hyderabad: 4th Floor, JQ Chambers, Gachibowli, Hyderabad 500032</p>
-            <p>Siddipet: 1-82/2, Opposite Vishal Mart, Siddipet 502103</p>
-          </div>
+          <FooterOffices />
         </div>
 
         <div className="flex flex-col gap-2">
@@ -58,3 +50,38 @@ const Footer = () => {
 };
 
 export default Footer;
+
+const FooterOffices = () => {
+  const [data, setData] = useState({ headOffice: "", branchOffices: [] });
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch("/api/settings");
+        const json = await res.json();
+        if (json?.success) {
+          setData(json.settings?.offices || { headOffice: "", branchOffices: [] });
+        }
+      } catch (e) {}
+    };
+    load();
+  }, []);
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="text-sm">
+        <p className="font-semibold">Head Office:</p>
+        {(data.headOffice || "GoTour HQ, 107 X Road, Mahalakshmi Nagar\nMothe, Jagtial, Telangana 505327").split("\n").map((ln, i) => (
+          <p key={i}>{ln}</p>
+        ))}
+      </div>
+      <div className="text-sm mt-2">
+        <p className="font-semibold">Branch Offices:</p>
+        {(data.branchOffices && data.branchOffices.length ? data.branchOffices : [
+          "Hyderabad: 4th Floor, JQ Chambers, Gachibowli, Hyderabad 500032",
+          "Siddipet: 1-82/2, Opposite Vishal Mart, Siddipet 502103",
+        ]).map((ln, i) => (
+          <p key={i}>{ln}</p>
+        ))}
+      </div>
+    </div>
+  );
+};

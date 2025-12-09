@@ -1,10 +1,16 @@
 import { useNavigate } from "react-router";
 import { FaUsers, FaGlobeAsia, FaLandmark, FaHeart } from "react-icons/fa";
 
-const Categories = () => {
+const Categories = ({ items: externalItems }) => {
   const navigate = useNavigate();
 
-  const items = [
+  const items = externalItems && externalItems.length ? externalItems.map((c) => ({
+    id: c.id,
+    title: c.title,
+    description: c.description,
+    icon: c.id === "Group" ? <FaUsers className="text-2xl" /> : c.id === "International" ? <FaGlobeAsia className="text-2xl" /> : c.id === "Domestic" ? <FaLandmark className="text-2xl" /> : <FaHeart className="text-2xl" />,
+    image: c.image,
+  })) : [
     {
       id: "Group",
       title: "Group",

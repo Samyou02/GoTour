@@ -23,10 +23,10 @@ const Footer = () => {
 
         <div className="flex flex-col gap-2">
           <p className="font-semibold">Travel Packages</p>
-          <Link className="hover:underline" to="/search?searchTerm=Domestic">Domestic Tours</Link>
-          <Link className="hover:underline" to="/search?searchTerm=International">International Tours</Link>
-          <Link className="hover:underline" to="/search?searchTerm=Group">Group Packages</Link>
-          <Link className="hover:underline" to="/search?searchTerm=Honeymoon">Honeymoon Packages</Link>
+          <Link className="hover:underline" to="/domestic">Domestic Tours</Link>
+          <Link className="hover:underline" to="/international">International Tours</Link>
+          <Link className="hover:underline" to="/group-tours">Group Packages</Link>
+          <Link className="hover:underline" to="/honeymoon">Honeymoon Packages</Link>
         </div>
 
         <div className="flex flex-col gap-2">

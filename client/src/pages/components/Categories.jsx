@@ -57,11 +57,12 @@ const Categories = ({ items: externalItems }) => {
           <button
             key={i}
             onClick={() => {
-              if (item.id === "Group") navigate("/group-tours");
-              else if (item.id === "International") navigate("/international");
-              else if (item.id === "Domestic") navigate("/domestic");
-              else if (item.id === "Honeymoon") navigate("/honeymoon");
-              else navigate(`/search?searchTerm=${item.id}`);
+              const key = (item.id || item.title || "").toLowerCase();
+              if (key.includes("group")) navigate("/group-tours");
+              else if (key.includes("international")) navigate("/international");
+              else if (key.includes("domestic")) navigate("/domestic");
+              else if (key.includes("honeymoon")) navigate("/honeymoon");
+              else navigate(`/search?searchTerm=${encodeURIComponent(item.title || item.id || "")}`);
             }}
             className="relative w-full h-40 rounded-xl overflow-hidden shadow-md hover:shadow-lg active:translate-y-[1px]"
           >

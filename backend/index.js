@@ -10,6 +10,7 @@ import statsRoute from "./routes/stats.route.js";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import path from "path";
+import fs from "fs";
 import cors from "cors";
 import User from "./models/user.model.js";
 import bcryptjs from "bcryptjs";
@@ -87,7 +88,27 @@ if (process.env.NODE_ENV_CUSTOM === "devolopment ") {
 }
 
 //port
-const PORT = process.env.PORT || 8000;
+function readClientApiPort() {
+  try {
+    const envPath = path.join(__dirname, "client", ".env");
+    const content = fs.readFileSync(envPath, "utf8");
+    const match = content.match(/^VITE_API_URL\s*=\s*(.+)$/m);
+    if (match) {
+      const apiUrl = match[1].trim().replace(/['"]/g, "");
+      try {
+        const u = new URL(apiUrl);
+        return u.port ? parseInt(u.port, 10) : 5000;
+      } catch (e) {
+        return 5000;
+      }
+    }
+  } catch (e) {
+    // ignore if client env not present
+  }
+  return undefined;
+}
+
+const PORT = readClientApiPort() || process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`listening on ${PORT}`);
 });

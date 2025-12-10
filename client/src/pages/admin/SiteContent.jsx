@@ -8,6 +8,19 @@ const SiteContent = () => {
     heroBackgroundImage: "",
     categories: [],
     offices: { headOffice: "", branchOffices: [] },
+    about: {
+      title: "",
+      intro: "",
+      images: [],
+      missionTitle: "",
+      missionText: "",
+      missionBullets: [],
+      offerTitle: "",
+      offerBullets: [],
+      offerText: "",
+      ctaTitle: "",
+      ctaText: "",
+    },
   });
 
   useEffect(() => {
@@ -81,6 +94,7 @@ const SiteContent = () => {
       setLoading(false);
       if (data?.success) {
         setSettings(data.settings);
+        window.dispatchEvent(new CustomEvent("settings-updated", { detail: { ts: Date.now() } }));
         alert("Updated successfully");
       } else {
         alert(data?.message || "Failed to update");
@@ -179,6 +193,84 @@ const SiteContent = () => {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="p-3 border rounded-lg">
+        <h3 className="text-lg font-semibold">About Page</h3>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label className="text-sm">Title</label>
+            <input className="p-2 border rounded w-full" value={settings.about?.title || ""} onChange={(e) => updateField("about", { ...settings.about, title: e.target.value })} />
+            <label className="text-sm mt-2 block">Intro</label>
+            <textarea rows={3} className="p-2 border rounded w-full" value={settings.about?.intro || ""} onChange={(e) => updateField("about", { ...settings.about, intro: e.target.value })} />
+            <label className="text-sm mt-2 block">Mission Title</label>
+            <input className="p-2 border rounded w-full" value={settings.about?.missionTitle || ""} onChange={(e) => updateField("about", { ...settings.about, missionTitle: e.target.value })} />
+            <label className="text-sm mt-2 block">Mission Text</label>
+            <textarea rows={3} className="p-2 border rounded w-full" value={settings.about?.missionText || ""} onChange={(e) => updateField("about", { ...settings.about, missionText: e.target.value })} />
+            <label className="text-sm mt-2 block">Mission Bullets</label>
+            <div className="flex flex-col gap-2">
+              {(settings.about?.missionBullets || []).map((b, i) => (
+                <div key={i} className="flex gap-2 items-center">
+                  <input className="p-2 border rounded w-full" value={b} onChange={(e) => {
+                    const next = [...(settings.about?.missionBullets || [])]; next[i] = e.target.value;
+                    updateField("about", { ...settings.about, missionBullets: next });
+                  }} />
+                  <button className="px-2 py-1 bg-red-600 text-white rounded" onClick={() => {
+                    const next = [...(settings.about?.missionBullets || [])]; next.splice(i,1);
+                    updateField("about", { ...settings.about, missionBullets: next });
+                  }}>Delete</button>
+                </div>
+              ))}
+              <button className="px-2 py-1 bg-slate-700 text-white rounded w-min" onClick={() => updateField("about", { ...settings.about, missionBullets: [ ...(settings.about?.missionBullets || []), "" ] })}>Add Bullet</button>
+            </div>
+          </div>
+          <div>
+            <label className="text-sm">Offer Title</label>
+            <input className="p-2 border rounded w-full" value={settings.about?.offerTitle || ""} onChange={(e) => updateField("about", { ...settings.about, offerTitle: e.target.value })} />
+            <label className="text-sm mt-2 block">Offer Text</label>
+            <textarea rows={3} className="p-2 border rounded w-full" value={settings.about?.offerText || ""} onChange={(e) => updateField("about", { ...settings.about, offerText: e.target.value })} />
+            <label className="text-sm mt-2 block">Offer Bullets</label>
+            <div className="flex flex-col gap-2">
+              {(settings.about?.offerBullets || []).map((b, i) => (
+                <div key={i} className="flex gap-2 items-center">
+                  <input className="p-2 border rounded w-full" value={b} onChange={(e) => {
+                    const next = [...(settings.about?.offerBullets || [])]; next[i] = e.target.value;
+                    updateField("about", { ...settings.about, offerBullets: next });
+                  }} />
+                  <button className="px-2 py-1 bg-red-600 text-white rounded" onClick={() => {
+                    const next = [...(settings.about?.offerBullets || [])]; next.splice(i,1);
+                    updateField("about", { ...settings.about, offerBullets: next });
+                  }}>Delete</button>
+                </div>
+              ))}
+              <button className="px-2 py-1 bg-slate-700 text-white rounded w-min" onClick={() => updateField("about", { ...settings.about, offerBullets: [ ...(settings.about?.offerBullets || []), "" ] })}>Add Bullet</button>
+            </div>
+            <label className="text-sm mt-2 block">CTA Title</label>
+            <input className="p-2 border rounded w-full" value={settings.about?.ctaTitle || ""} onChange={(e) => updateField("about", { ...settings.about, ctaTitle: e.target.value })} />
+            <label className="text-sm mt-2 block">CTA Text</label>
+            <textarea rows={3} className="p-2 border rounded w-full" value={settings.about?.ctaText || ""} onChange={(e) => updateField("about", { ...settings.about, ctaText: e.target.value })} />
+          </div>
+        </div>
+        <label className="text-sm mt-2 block">About Images</label>
+        <div className="flex flex-wrap gap-3 items-center">
+          {(settings.about?.images || []).slice(0,3).map((img, i) => (
+            <div key={i} className="flex gap-2 items-center">
+              <a href={img} target="_blank" rel="noreferrer" className="text-blue-600 underline">Image {i+1}</a>
+              <button className="px-2 py-1 bg-red-600 text-white rounded" onClick={() => {
+                const next = [...(settings.about?.images || [])]; next.splice(i,1);
+                updateField("about", { ...settings.about, images: next });
+              }}>Delete</button>
+            </div>
+          ))}
+          <input type="file" accept="image/*" onChange={async (e) => {
+            const f = e.target.files?.[0]; if (!f) return; 
+            if ((settings.about?.images || []).length >= 3) { alert("Only 3 images allowed"); e.target.value = ""; return; }
+            setLoading(true);
+            try { const url = await uploadFile(f, "about"); updateField("about", { ...settings.about, images: [ ...(settings.about?.images || []), url ] }); }
+            catch { alert("Upload failed"); }
+            setLoading(false);
+          }} />
         </div>
       </div>
 

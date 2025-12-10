@@ -2,6 +2,7 @@ import Settings from "../models/settings.model.js";
 
 export const getSettings = async (req, res) => {
   try {
+    res.set("Cache-Control", "no-store");
     let settings = await Settings.findOne();
     if (!settings) {
       settings = await Settings.create({
@@ -31,6 +32,13 @@ export const getSettings = async (req, res) => {
             image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop",
           },
         ],
+        about: {
+          images: [
+            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?q=80&w=1200&auto=format&fit=crop",
+          ],
+        },
       });
     }
     return res.status(200).send({ success: true, settings });
@@ -42,7 +50,7 @@ export const getSettings = async (req, res) => {
 export const upsertSettings = async (req, res) => {
   try {
     const update = req.body || {};
-    const settings = await Settings.findOneAndUpdate({}, update, { new: true, upsert: true });
+    const settings = await Settings.findOneAndUpdate({}, { $set: update }, { new: true, upsert: true });
     return res.status(200).send({ success: true, settings });
   } catch (e) {
     return res.status(500).send({ success: false, message: "Failed to update settings" });

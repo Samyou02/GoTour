@@ -8,6 +8,14 @@ import Profile from "./pages/Profile";
 import About from "./pages/About";
 import PrivateRoute from "./pages/Routes/PrivateRoute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AllBookings from "./pages/admin/AllBookings";
+import AddPackages from "./pages/admin/AddPackages";
+import AllPackages from "./pages/admin/AllPackages";
+import AllUsers from "./pages/admin/AllUsers";
+import Payments from "./pages/admin/Payments";
+import RatingsReviews from "./pages/admin/RatingsReviews";
+import History from "./pages/admin/History";
+import AdminUpdateProfile from "./pages/admin/AdminUpdateProfile";
 import SiteContent from "./pages/admin/SiteContent";
 import AdminRoute from "./pages/Routes/AdminRoute";
 import UpdatePackage from "./pages/admin/UpdatePackage";
@@ -51,8 +59,16 @@ const App = () => {
         {/* admin */}
         <Route path="/profile" element={<AdminRoute />}>
           <Route path="admin" element={<AdminDashboard />} />
-          <Route path="admin/update-package/:id" element={<UpdatePackage />} />
           <Route path="admin/site-content" element={<SiteContent />} />
+          <Route path="admin/bookings" element={<AllBookings />} />
+          <Route path="admin/add-packages" element={<AddPackages />} />
+          <Route path="admin/all-packages" element={<AllPackages />} />
+          <Route path="admin/users" element={<AllUsers />} />
+          <Route path="admin/payments" element={<Payments />} />
+          <Route path="admin/ratings-reviews" element={<RatingsReviews />} />
+          <Route path="admin/history" element={<History />} />
+          <Route path="admin/update-package/:id" element={<UpdatePackage />} />
+          <Route path="admin/update-profile" element={<AdminUpdateProfile />} />
         </Route>
         <Route path="/about" element={<About />} />
         <Route path="/package/:id" element={<Package />} />

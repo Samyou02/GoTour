@@ -243,7 +243,7 @@ const AdminDashboard = () => {
           {/* ---------------------------------------------------------------------------------------- */}
           <div className="w-[65%] max-sm:w-full">
             <div className="main-div">
-              <nav className="w-full border-blue-500 border-b-4 overflow-x-auto navbar">
+              <div className="hidden">
                 <div className="w-full flex gap-2">
                   <button
                     className={
@@ -345,31 +345,13 @@ const AdminDashboard = () => {
                     Update Profile
                   </button> */}
                 </div>
-              </nav>
-              <div className="content-div flex flex-wrap">
-                {activePanelId === 1 ? (
-                  <AllBookings />
-                ) : activePanelId === 2 ? (
-                  <AddPackages />
-                ) : activePanelId === 3 ? (
-                  <AllPackages />
-                ) : activePanelId === 4 ? (
-                  <AllUsers />
-                ) : activePanelId === 5 ? (
-                  <Payments />
-                ) : activePanelId === 6 ? (
-                  <RatingsReviews />
-                ) : activePanelId === 7 ? (
-                  <History />
-                ) : activePanelId === 8 ? (
-                  <AdminUpdateProfile />
-                ) : activePanelId === 9 ? (
-                  <div className="w-full p-2">
-                    <Link className="text-blue-600 underline" to="/profile/admin/site-content">Open Site Content Editor</Link>
-                  </div>
-                ) : (
-                  <div>Page Not Found!</div>
-                )}
+              </div>
+              <div className="p-6">
+                <p className="text-lg">Admin tools are available from the top navigation under <span className="font-semibold">Admin</span>.</p>
+                <div className="mt-3 flex gap-2 flex-wrap">
+                  <Link className="px-3 py-2 bg-blue-600 text-white rounded" to="/profile/admin/update-profile">Update Profile</Link>
+                  <Link className="px-3 py-2 bg-blue-600 text-white rounded" to="/profile/admin/site-content">Site Content</Link>
+                </div>
               </div>
             </div>
           </div>

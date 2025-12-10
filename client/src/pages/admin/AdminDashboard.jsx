@@ -322,6 +322,15 @@ const AdminDashboard = () => {
                   >
                     History
                   </button>
+                  <Link
+                    className={
+                      "p-1 rounded-t transition-all duration-300 text-nowrap"
+                    }
+                    id="inbox"
+                    to="/profile/admin/inbox"
+                  >
+                    Inbox
+                  </Link>
                   <button
                     className={
                       activePanelId === 9

@@ -3,6 +3,7 @@ import {
   deleteUserAccount,
   deleteUserAccountAdmin,
   getAllUsers,
+  getAdminInfo,
   updateProfilePhoto,
   updateUser,
   updateUserPassword,
@@ -35,6 +36,9 @@ router.delete("/delete/:id", requireSignIn, deleteUserAccount);
 
 //get all users
 router.get("/getAllUsers", requireSignIn, isAdmin, getAllUsers);
+
+// get admin info
+router.get("/admin-info", requireSignIn, getAdminInfo);
 
 //admin delete user accounts
 router.delete(

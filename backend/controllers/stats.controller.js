@@ -4,12 +4,7 @@ import RatingReview from "../models/ratings_reviews.model.js";
 
 export const getOverviewStats = async (req, res) => {
   try {
-    const nowIso = new Date().toISOString();
-
-    const completedTrips = await Booking.countDocuments({
-      status: { $ne: "Cancelled" },
-      date: { $lt: nowIso },
-    });
+    const completedTrips = await Booking.countDocuments({ status: "Completed" });
 
     const destinations = await Package.distinct("packageDestination");
     const totalDestinations = destinations.length;

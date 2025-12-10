@@ -33,6 +33,7 @@ import Honeymoon from "./pages/Honeymoon";
 import HoneymoonDestinationPackages from "./pages/HoneymoonDestinationPackages";
 import Itinerary from "./pages/Itinerary";
 import Footer from "./pages/components/Footer";
+import AdminInbox from "./pages/admin/AdminInbox";
 
 const App = () => {
   return (
@@ -57,19 +58,20 @@ const App = () => {
           <Route path="user" element={<Profile />} />
         </Route>
         {/* admin */}
-        <Route path="/profile" element={<AdminRoute />}>
-          <Route path="admin" element={<AdminDashboard />} />
-          <Route path="admin/site-content" element={<SiteContent />} />
-          <Route path="admin/bookings" element={<AllBookings />} />
-          <Route path="admin/add-packages" element={<AddPackages />} />
-          <Route path="admin/all-packages" element={<AllPackages />} />
-          <Route path="admin/users" element={<AllUsers />} />
-          <Route path="admin/payments" element={<Payments />} />
-          <Route path="admin/ratings-reviews" element={<RatingsReviews />} />
-          <Route path="admin/history" element={<History />} />
-          <Route path="admin/update-package/:id" element={<UpdatePackage />} />
-          <Route path="admin/update-profile" element={<AdminUpdateProfile />} />
-        </Route>
+  <Route path="/profile" element={<AdminRoute />}>
+    <Route path="admin" element={<AdminDashboard />} />
+    <Route path="admin/site-content" element={<SiteContent />} />
+    <Route path="admin/bookings" element={<AllBookings />} />
+    <Route path="admin/add-packages" element={<AddPackages />} />
+    <Route path="admin/all-packages" element={<AllPackages />} />
+    <Route path="admin/users" element={<AllUsers />} />
+    <Route path="admin/payments" element={<Payments />} />
+    <Route path="admin/ratings-reviews" element={<RatingsReviews />} />
+    <Route path="admin/history" element={<History />} />
+    <Route path="admin/inbox" element={<AdminInbox />} />
+    <Route path="admin/update-package/:id" element={<UpdatePackage />} />
+    <Route path="admin/update-profile" element={<AdminUpdateProfile />} />
+  </Route>
         <Route path="/about" element={<About />} />
         <Route path="/package/:id" element={<Package />} />
         <Route path="/package/ratings/:id" element={<RatingsPage />} />

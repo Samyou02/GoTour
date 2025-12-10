@@ -7,6 +7,8 @@ import ratingRoute from "./routes/rating.route.js";
 import bookingRoute from "./routes/booking.route.js";
 import uploadRoute from "./routes/upload.route.js";
 import statsRoute from "./routes/stats.route.js";
+import notificationRoute from "./routes/notification.route.js";
+import messageRoute from "./routes/message.route.js";
 import settingsRoute from "./routes/settings.route.js";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
@@ -74,6 +76,8 @@ app.use("/api/booking", bookingRoute);
 app.use("/api/upload", uploadRoute);
 app.use("/api/stats", statsRoute);
 app.use("/api/settings", settingsRoute);
+app.use("/api/notification", notificationRoute);
+app.use("/api/message", messageRoute);
 
 if (process.env.NODE_ENV_CUSTOM === "devolopment ") {
   //static files

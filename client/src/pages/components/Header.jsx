@@ -31,6 +31,7 @@ const Header = () => {
               <li className="hover:scale-105 transition-all duration-150 hover:drop-shadow"><Link to={`/profile/admin/payments`}>Payments</Link></li>
               <li className="hover:scale-105 transition-all duration-150 hover:drop-shadow"><Link to={`/profile/admin/ratings-reviews`}>Ratings/Reviews</Link></li>
               <li className="hover:scale-105 transition-all duration-150 hover:drop-shadow"><Link to={`/profile/admin/history`}>History</Link></li>
+              <li className="hover:scale-105 transition-all duration-150 hover:drop-shadow"><Link to={`/profile/admin/inbox`}>Inbox</Link></li>
               <li className="hover:scale-105 transition-all duration-150 hover:drop-shadow"><Link to={`/profile/admin/update-profile`}>Update Profile</Link></li>
             </>
           )}

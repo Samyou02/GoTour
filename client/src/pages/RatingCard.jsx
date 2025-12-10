@@ -1,8 +1,30 @@
 import { Rating } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 const RatingCard = ({ packageRatings }) => {
+  const { currentUser } = useSelector((s) => s.user);
+  const [respondText, setRespondText] = useState("");
+  const [submittingId, setSubmittingId] = useState(null);
+
+  const respond = async (ratingId) => {
+    try {
+      setSubmittingId(ratingId);
+      const res = await fetch(`/api/rating/respond/${ratingId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: respondText }),
+      });
+      const json = await res.json();
+      alert(json?.message || "Saved");
+      setSubmittingId(null);
+      setRespondText("");
+    } catch (e) {
+      setSubmittingId(null);
+    }
+  };
+
   return (
     <>
       {packageRatings &&
@@ -60,6 +82,22 @@ const RatingCard = ({ packageRatings }) => {
                   </>
                 )}
               </p>
+              {/* admin response */}
+              <div className="mt-2">
+                {rating?.adminResponse?.text ? (
+                  <div className="border rounded p-2 text-sm">
+                    <p className="font-semibold">Admin response</p>
+                    <p>{rating.adminResponse.text}</p>
+                  </div>
+                ) : (
+                  currentUser?.user_role === 1 && (
+                    <div className="flex flex-col gap-2">
+                      <textarea className="border rounded p-2" rows={2} placeholder="Write a single response" value={respondText} onChange={(e) => setRespondText(e.target.value)} />
+                      <button className="px-3 py-1 bg-blue-600 text-white rounded" disabled={!respondText || submittingId === rating._id} onClick={() => respond(rating._id)}>Respond</button>
+                    </div>
+                  )
+                )}
+              </div>
               {/* full review */}
               {rating.review.length > 90 && (
                 <div

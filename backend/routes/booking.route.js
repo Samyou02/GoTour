@@ -7,6 +7,8 @@ import {
   getAllUserBookings,
   getCurrentBookings,
   getUserCurrentBookings,
+  startTrip,
+  endTrip,
 } from "../controllers/booking.controller.js";
 import { isAdmin, requireSignIn } from "../middlewares/authMiddleware.js";
 
@@ -40,5 +42,11 @@ router.delete(
 
 //cancle booking by id
 router.post("/cancel-booking/:id/:userId", requireSignIn, cancelBooking);
+
+// start trip (admin only)
+router.post("/start-trip/:id", requireSignIn, isAdmin, startTrip);
+
+// end trip (admin only)
+router.post("/end-trip/:id", requireSignIn, isAdmin, endTrip);
 
 export default router;

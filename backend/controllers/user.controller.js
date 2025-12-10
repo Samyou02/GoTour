@@ -178,6 +178,20 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
+// get single admin info
+export const getAdminInfo = async (req, res) => {
+  try {
+    const email = process.env.ADMIN_EMAIL || "admin@gmail.com";
+    const admin = await User.findOne({ email, user_role: 1 }).select("_id username email avatar");
+    if (!admin) {
+      return res.status(404).send({ success: false, message: "Admin not found" });
+    }
+    return res.status(200).send({ success: true, admin });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, message: "Failed to load admin info" });
+  }
+};
 //delete user admin
 export const deleteUserAccountAdmin = async (req, res, next) => {
   try {

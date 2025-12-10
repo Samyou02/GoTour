@@ -8,6 +8,7 @@ const RatingsReviews = () => {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [showMoreBtn, setShowMoreBtn] = useState(false);
+  const [latestReviews, setLatestReviews] = useState({});
 
   const getPackages = async () => {
     setPackages([]);
@@ -22,6 +23,17 @@ const RatingsReviews = () => {
       if (data?.success) {
         setPackages(data?.packages);
         setLoading(false);
+        try {
+          const ids = (data?.packages || []).map((p) => p._id);
+          await Promise.all(
+            ids.map(async (id) => {
+              const r = await fetch(`/api/rating/get-ratings/${id}/1`);
+              const arr = await r.json();
+              const item = Array.isArray(arr) && arr.length ? arr[0] : null;
+              setLatestReviews((prev) => ({ ...prev, [id]: item }));
+            })
+          );
+        } catch (e) {}
       } else {
         setLoading(false);
         alert(data?.message || "Something went wrong!");
@@ -53,6 +65,16 @@ const RatingsReviews = () => {
       setShowMoreBtn(false);
     }
     setPackages([...packages, ...data?.packages]);
+    try {
+      await Promise.all(
+        (data?.packages || []).map(async (p) => {
+          const r = await fetch(`/api/rating/get-ratings/${p._id}/1`);
+          const arr = await r.json();
+          const item = Array.isArray(arr) && arr.length ? arr[0] : null;
+          setLatestReviews((prev) => ({ ...prev, [p._id]: item }));
+        })
+      );
+    } catch (e) {}
   };
 
   return (
@@ -128,6 +150,11 @@ const RatingsReviews = () => {
                   />
                   ({pack?.packageTotalRatings})
                 </p>
+                <div className="w-full text-sm text-gray-700">
+                  {latestReviews[pack._id]?.review
+                    ? latestReviews[pack._id].review
+                    : "No reviews yet"}
+                </div>
               </div>
             );
           })

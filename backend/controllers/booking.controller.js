@@ -276,3 +276,65 @@ export const cancelBooking = async (req, res) => {
     console.log(error);
   }
 };
+
+// start trip (admin only)
+export const startTrip = async (req, res) => {
+  try {
+    const updated = await Booking.findByIdAndUpdate(
+      req?.params?.id,
+      { status: "Started" },
+      { new: true }
+    );
+    if (updated) {
+      return res.status(200).send({ success: true, message: "Trip started!" });
+    } else {
+      return res
+        .status(404)
+        .send({ success: false, message: "Booking not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: "Failed to start trip" });
+  }
+};
+
+// end trip (admin only)
+export const endTrip = async (req, res) => {
+  try {
+    const updated = await Booking.findByIdAndUpdate(
+      req?.params?.id,
+      { status: "Completed" },
+      { new: true }
+    );
+    if (updated) {
+      try {
+        const NotificationModule = (await import("../models/notification.model.js")).default;
+        const pkgName = updated?.packageDetails?.packageName;
+        const packageId = updated?.packageDetails?._id || updated?.packageDetails;
+        await NotificationModule.create({
+          userRef: updated?.buyer,
+          title: "Your trip is completed",
+          body: `Please share feedback${pkgName ? ` for ${pkgName}` : ""}.`,
+          type: "feedback",
+          link: packageId ? `/package/ratings/${packageId}` : "",
+        });
+      } catch (e) {
+        console.log("notify-error", e?.message || e);
+      }
+      return res
+        .status(200)
+        .send({ success: true, message: "Trip marked as completed!" });
+    } else {
+      return res
+        .status(404)
+        .send({ success: false, message: "Booking not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: "Failed to complete trip" });
+  }
+};

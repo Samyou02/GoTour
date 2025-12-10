@@ -121,3 +121,54 @@ export const getAllRatings = async (req, res) => {
     console.log(error);
   }
 };
+
+export const respondToRating = async (req, res) => {
+  try {
+    const { ratingId } = req.params;
+    const { text } = req.body;
+    const doc = await RatingReview.findById(ratingId);
+    if (!doc) return res.status(404).send({ success: false, message: "Rating not found" });
+    if (doc.adminResponse?.text) {
+      return res.status(400).send({ success: false, message: "Already responded" });
+    }
+    doc.adminResponse = { text, respondedBy: req.user.id, respondedAt: new Date() };
+    await doc.save();
+    try {
+      const Notification = (await import("../models/notification.model.js")).default;
+      await Notification.create({
+        userRef: doc.userRef,
+        title: "Admin responded to your feedback",
+        body: text?.slice(0, 180) || "",
+        type: "admin_response",
+        link: `/package/ratings/${doc.packageId}`,
+      });
+    } catch (e) {
+      console.log("notify-response-error", e?.message || e);
+    }
+    return res.status(200).send({ success: true, message: "Response saved" });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({ success: false, message: "Failed to respond" });
+  }
+};
+
+export const respondAllForPackage = async (req, res) => {
+  try {
+    const { packageId } = req.params;
+    const { text } = req.body;
+    const ratings = await RatingReview.find({ packageId });
+    const Notification = (await import("../models/notification.model.js")).default;
+    let updated = 0;
+    for (const r of ratings) {
+      if (r.adminResponse?.text) continue;
+      r.adminResponse = { text, respondedBy: req.user.id, respondedAt: new Date() };
+      await r.save();
+      updated++;
+      await Notification.create({ userRef: r.userRef, title: "Admin responded to your feedback", body: text?.slice(0, 180) || "", type: "admin_response", link: `/package/ratings/${r.packageId}` });
+    }
+    return res.status(200).send({ success: true, message: `Responded to ${updated} review(s)` });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({ success: false, message: "Failed to respond all" });
+  }
+};

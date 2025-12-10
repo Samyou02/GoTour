@@ -5,7 +5,10 @@ import {
   getAllRatings,
   giveRating,
   ratingGiven,
+  respondToRating,
+  respondAllForPackage,
 } from "../controllers/rating.controller.js";
+import { isAdmin } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -20,5 +23,11 @@ router.get("/rating-given/:userId/:packageId", requireSignIn, ratingGiven);
 
 //get all ratings by package id
 router.get("/get-ratings/:id/:limit", getAllRatings);
+
+// admin respond to rating once
+router.post("/respond/:ratingId", requireSignIn, isAdmin, respondToRating);
+
+// admin respond to all ratings for a package (once per user)
+router.post("/respond-all/:packageId", requireSignIn, isAdmin, respondAllForPackage);
 
 export default router;

@@ -15,7 +15,7 @@ const AllBookings = () => {
     try {
       setLoading(true);
       const res = await fetch(
-        `/api/booking/get-currentBookings?searchTerm=${searchTerm}`
+        `/api/booking/get-allBookings?searchTerm=${searchTerm}`
       );
       const data = await res.json();
       if (data?.success) {
@@ -44,6 +44,46 @@ const AllBookings = () => {
           method: "POST",
         }
       );
+      const data = await res.json();
+      if (data?.success) {
+        setLoading(false);
+        alert(data?.message);
+        getAllBookings();
+      } else {
+        setLoading(false);
+        alert(data?.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleStartTrip = async (id) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/booking/start-trip/${id}`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (data?.success) {
+        setLoading(false);
+        alert(data?.message);
+        getAllBookings();
+      } else {
+        setLoading(false);
+        alert(data?.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleEndTrip = async (id) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/booking/end-trip/${id}`, {
+        method: "POST",
+      });
       const data = await res.json();
       if (data?.success) {
         setLoading(false);
@@ -98,14 +138,46 @@ const AllBookings = () => {
                 <p>{booking?.buyer?.username}</p>
                 <p>{booking?.buyer?.email}</p>
                 <p>{booking?.date}</p>
-                <button
-                  onClick={() => {
-                    handleCancel(booking._id);
-                  }}
-                  className="p-2 rounded bg-red-600 text-white hover:opacity-95"
-                >
-                  Cancel
-                </button>
+                <p className={
+                  booking?.status === "Cancelled"
+                    ? "px-2 py-1 rounded bg-red-100 text-red-700"
+                    : booking?.status === "Completed"
+                    ? "px-2 py-1 rounded bg-green-100 text-green-700"
+                    : booking?.status === "Started"
+                    ? "px-2 py-1 rounded bg-blue-100 text-blue-700"
+                    : "px-2 py-1 rounded bg-gray-100 text-gray-700"
+                }>
+                  {booking?.status}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      handleStartTrip(booking._id);
+                    }}
+                    disabled={booking?.status !== "Booked"}
+                    className="p-2 rounded bg-blue-600 text-white hover:opacity-95 disabled:opacity-50"
+                  >
+                    Start Trip
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleEndTrip(booking._id);
+                    }}
+                    disabled={booking?.status !== "Started"}
+                    className="p-2 rounded bg-green-600 text-white hover:opacity-95 disabled:opacity-50"
+                  >
+                    End Trip
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleCancel(booking._id);
+                    }}
+                    disabled={booking?.status !== "Booked"}
+                    className="p-2 rounded bg-red-600 text-white hover:opacity-95 disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             );
           })}

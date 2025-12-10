@@ -34,7 +34,7 @@ const Inbox = () => {
       const res = await fetch(`/api/message/conversation/${currentUser._id}/${admin._id}`);
       const json = await res.json();
       if (json?.success) setMessages(json.messages || []);
-    } catch (e) {}
+    } catch (e) { console.log(e); }
   };
 
   useEffect(() => {
@@ -58,23 +58,23 @@ const Inbox = () => {
         setText("");
         setMessages((m) => [...m, json.message]);
       }
-    } catch (e) {}
+    } catch (e) { console.log(e); }
   };
 
   return (
     <div className="w-full flex justify-center">
-      <div className="w-[95%] shadow-xl rounded-lg p-3 flex flex-col gap-6">
-        <h1 className="text-2xl font-semibold">Inbox</h1>
-        <div>
+      <div className="w-[95%] bg-white shadow-xl rounded-xl p-6 flex flex-col gap-8">
+        <h1 className="text-2xl font-semibold text-slate-800">Inbox</h1>
+        <div className="bg-slate-50 rounded-xl border p-4">
           <h2 className="text-lg font-semibold">Notifications</h2>
-          {loading && <p>Loading...</p>}
-          {!loading && notifications.length === 0 && <p>No notifications</p>}
-          <div className="flex flex-col gap-2">
+          {loading && <p className="text-sm text-gray-600">Loading...</p>}
+          {!loading && notifications.length === 0 && <p className="text-sm text-gray-600">No notifications</p>}
+          <div className="flex flex-col gap-3">
             {notifications.map((n) => (
-              <div key={n._id} className="border rounded p-2 flex items-center justify-between">
+              <div key={n._id} className="rounded-lg border bg-white p-3 flex items-center justify-between">
                 <div>
                   <p className="font-semibold">{n.title}</p>
-                  <p className="text-sm text-gray-700">{n.body}</p>
+                  <p className="text-sm text-gray-600 truncate max-w-[45ch]">{n.body}</p>
                 </div>
                 {n.link && (
                   <Link className="px-3 py-1 bg-blue-600 text-white rounded" to={n.link}>
@@ -86,21 +86,21 @@ const Inbox = () => {
           </div>
         </div>
 
-        <div>
+        <div className="bg-white rounded-xl border p-4">
           <h2 className="text-lg font-semibold">Chat with Admin</h2>
           {!admin && <p>Loading admin...</p>}
           {admin && (
-            <div className="flex flex-col gap-2">
-              <div className="h-64 overflow-y-auto border rounded p-2 flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
+              <div className="h-72 overflow-y-auto rounded-lg p-3 flex flex-col gap-2 bg-slate-50">
                 {messages.map((m) => (
                   <div key={m._id} className={m.from === currentUser._id ? "text-right" : "text-left"}>
-                    <span className="inline-block px-3 py-1 rounded bg-gray-100">{m.text}</span>
+                    <span className={m.from === currentUser._id ? "inline-block px-3 py-2 rounded-lg bg-blue-600 text-white" : "inline-block px-3 py-2 rounded-lg bg-gray-200 text-slate-800"}>{m.text}</span>
                   </div>
                 ))}
               </div>
               <div className="flex gap-2">
-                <input value={text} onChange={(e) => setText(e.target.value)} className="border p-2 rounded flex-1" placeholder="Type a message" />
-                <button className="px-3 py-2 bg-blue-600 text-white rounded" onClick={send}>Send</button>
+                <input value={text} onChange={(e) => setText(e.target.value)} className="border p-2 rounded-lg flex-1" placeholder="Type a message" />
+                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg" onClick={send}>Send</button>
               </div>
             </div>
           )}

@@ -1,5 +1,5 @@
 import { Rating } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const RatingsReviews = () => {
@@ -33,7 +33,7 @@ const RatingsReviews = () => {
               setLatestReviews((prev) => ({ ...prev, [id]: item }));
             })
           );
-        } catch (e) {}
+        } catch (e) { console.log(e); }
       } else {
         setLoading(false);
         alert(data?.message || "Something went wrong!");
@@ -64,28 +64,28 @@ const RatingsReviews = () => {
     if (data?.packages?.length < 9) {
       setShowMoreBtn(false);
     }
-    setPackages([...packages, ...data?.packages]);
+    setPackages([...(packages || []), ...((data && data.packages) ? data.packages : [])]);
     try {
       await Promise.all(
-        (data?.packages || []).map(async (p) => {
+        ((data && data.packages) ? data.packages : []).map(async (p) => {
           const r = await fetch(`/api/rating/get-ratings/${p._id}/1`);
           const arr = await r.json();
           const item = Array.isArray(arr) && arr.length ? arr[0] : null;
           setLatestReviews((prev) => ({ ...prev, [p._id]: item }));
         })
       );
-    } catch (e) {}
+    } catch (e) { console.log(e); }
   };
 
   return (
     <>
-      <div className="shadow-xl rounded-lg w-full flex flex-col p-5 justify-center gap-2">
+      <div className="w-full flex flex-col p-6 gap-6 bg-white shadow-xl rounded-xl">
         {loading && <h1 className="text-center text-lg">Loading...</h1>}
         {packages && (
           <>
-            <div>
+            <div className="flex items-center gap-3">
               <input
-                className="p-2 rounded border"
+                className="p-2 rounded-lg border flex-1 max-w-md"
                 type="text"
                 placeholder="Search"
                 value={search}
@@ -94,11 +94,11 @@ const RatingsReviews = () => {
                 }}
               />
             </div>
-            <div className="my-2 border-y-2 py-2">
-              <ul className="w-full flex justify-around">
+            <div className="my-2 py-2">
+              <ul className="w-full flex justify-center gap-4">
                 <li
-                  className={`cursor-pointer hover:scale-95 border rounded-xl p-2 transition-all duration-300 ${
-                    filter === "all" && "bg-blue-500 text-white"
+                  className={`cursor-pointer px-4 py-1 rounded-full border transition-all duration-200 ${
+                    filter === "all" ? "bg-blue-600 text-white" : "bg-slate-50 text-slate-800"
                   }`}
                   id="all"
                   onClick={(e) => {
@@ -108,8 +108,8 @@ const RatingsReviews = () => {
                   All
                 </li>
                 <li
-                  className={`cursor-pointer hover:scale-95 border rounded-xl p-2 transition-all duration-300 ${
-                    filter === "most" && "bg-blue-500 text-white"
+                  className={`cursor-pointer px-4 py-1 rounded-full border transition-all duration-200 ${
+                    filter === "most" ? "bg-blue-600 text-white" : "bg-slate-50 text-slate-800"
                   }`}
                   id="most"
                   onClick={(e) => {
@@ -127,22 +127,22 @@ const RatingsReviews = () => {
           packages.map((pack, i) => {
             return (
               <div
-                className="border rounded-lg w-full flex p-3 justify-between gap-2 flex-wrap items-center hover:scale-[1.02] transition-all duration-300"
+                className="border rounded-xl w-full p-4 grid sm:grid-cols-[80px_1fr_auto] grid-cols-1 gap-4 items-center bg-white hover:shadow-md transition"
                 key={i}
               >
                 <Link to={`/package/ratings/${pack._id}`}>
                   <img
                     src={pack?.packageImages[0]}
                     alt="image"
-                    className="w-20 h-20 rounded"
+                    className="w-20 h-20 rounded object-cover"
                   />
                 </Link>
                 <Link to={`/package/ratings/${pack._id}`}>
-                  <p className="font-semibold hover:underline">
+                  <p className="font-semibold text-slate-800 hover:underline">
                     {pack?.packageName}
                   </p>
                 </Link>
-                <p className="flex items-center">
+                <p className="flex items-center justify-end">
                   <Rating
                     value={pack?.packageRating}
                     precision={0.1}
@@ -150,7 +150,7 @@ const RatingsReviews = () => {
                   />
                   ({pack?.packageTotalRatings})
                 </p>
-                <div className="w-full text-sm text-gray-700">
+                <div className="sm:col-start-1 sm:col-end-4 w-full text-sm text-gray-700">
                   {latestReviews[pack._id]?.review
                     ? latestReviews[pack._id].review
                     : "No reviews yet"}
@@ -164,7 +164,7 @@ const RatingsReviews = () => {
         {showMoreBtn && (
           <button
             onClick={onShowMoreSClick}
-            className="text-sm bg-green-700 text-white hover:underline p-2 m-3 rounded text-center w-max"
+            className="text-sm bg-green-600 text-white hover:brightness-105 px-4 py-2 mt-2 rounded-lg text-center w-max self-center"
           >
             Show More
           </button>
